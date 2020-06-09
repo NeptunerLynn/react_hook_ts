@@ -1,86 +1,86 @@
-import { Button, Checkbox, Form, Icon, Input, message } from 'antd';
-import { FormComponentProps } from 'antd/lib/form';
+import { Button, Checkbox, Form, Input, message } from 'antd';
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
+// import { FormComponentProps } from 'antd/lib/form';
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import 'src/assets/less/login.less';
+import '../../assets/less/login.less';
 
-interface ILoginParam {
+interface LoginParam {
     username: string;
     password: string;
     remember: boolean;
 }
 
-interface ILoginFormProps extends FormComponentProps, RouteComponentProps {
-}
+interface LoginFormProps extends RouteComponentProps {}
 
-class LoginForm extends React.Component<ILoginFormProps, ILoginParam> {
-    readonly state: Readonly<ILoginParam> = {
+class LoginPage extends React.Component<LoginFormProps, LoginParam> {
+    readonly state: Readonly<LoginParam> = {
         username: '',
         password: '',
         remember: true,
     }
 
-    constructor(props: ILoginFormProps) {
+    constructor(props: LoginFormProps) {
         super(props);
     }
 
-    handleSubmit = (e: React.SyntheticEvent) => {
-        e.preventDefault();
-        this.props.form.validateFields(async (err, values) => {
-            if (!err) {
-                try {
-                    this.props.history.push('/home');
-                } catch (error) {
-                    message.error(JSON.stringify(error));
-                }
-            }
-        });
+    onFinish = values => {
+        console.log(this.props)
+        console.log('Success:', values);
+        this.props.history.push('/home');
+    }
+      
+    onFinishFailed = errorInfo => {
+        console.log('Failed:', errorInfo);
     }
 
+    onRegister = () => {
+      this.props.history.push('/register');
+    }
     render() {
-        const { getFieldDecorator } = this.props.form;
         return (
-            <div className="login-box">
-                <div className="login">
-                    <div className="login-form-box">
-                        <div className="login-logo">
-                            <div className="login-name">登录</div>
-                        </div>
-                        <Form onSubmit={this.handleSubmit} className="login-form">
-                            <Form.Item>
-                                {getFieldDecorator(`username`, {
-                                    initialValue: this.state.username,
-                                    rules: [{ required: true, message: '用户名不能为空' }]
-                                })(
-                                    <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder='username' />
-                                )}
-                            </Form.Item>
-                            <Form.Item>
-                                {getFieldDecorator(`password`, {
-                                    initialValue: this.state.password,
-                                    rules: [{ required: true, message: '密码不能为空' }]
-                                })(
-                                    <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder='password' />
-                                )}
-                            </Form.Item>
-                            <Form.Item>
-                                {getFieldDecorator(`remember`, {
-                                    valuePropName: 'checked',
-                                    initialValue: this.state.remember,
-                                })(
-                                    <Checkbox>记住密码</Checkbox>
-                                )}
-                                <Button type="primary" htmlType="submit" className="login-form-button">
-                                    登录
-                                </Button>
-                            </Form.Item>
-                        </Form>
-                    </div>
+                <div id="loginContent">
+                  <div className="login-card">
+                    <div className="login-card-title">欢 迎 登 录</div>
+                    <Form
+                      name="basic"
+                      initialValues={{ remember: true }}
+                      onFinish={this.onFinish}
+                      onFinishFailed={this.onFinishFailed}
+                    >
+                      <Form.Item
+                        name="username"
+                        rules={[{ required: true, message: '请输入账号!' }]}
+                      >
+                        <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="账号" />
+                      </Form.Item>
+
+                      <Form.Item
+                        name="password"
+                        rules={[{ required: true, message: '请输入密码!' }]}
+                      >
+                        <Input.Password prefix={<LockOutlined className="site-form-item-icon" />} placeholder="密码"/>
+                      </Form.Item>
+
+                      <Form.Item>
+                        <Form.Item name="remember" valuePropName="checked" noStyle>
+                          <Checkbox>记住密码</Checkbox>
+                        </Form.Item>
+                        <a className="login-form-forgot" href="#!" onClick={this.onRegister}>
+                          没有账号？先注册吧！
+                        </a>
+                      </Form.Item>
+
+                      <Form.Item>
+                        <Button type="primary" htmlType="submit" block>
+                          登录
+                        </Button>
+                      </Form.Item>
+                    </Form>
+                  </div> 
                 </div>
-            </div>
         );
     }
 }
 
-const LoginPage = Form.create()(LoginForm);
 export default LoginPage;
