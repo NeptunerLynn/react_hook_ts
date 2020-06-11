@@ -33,10 +33,6 @@ class LoginPage extends React.Component<LoginFormProps, LoginParam> {
     onFinishFailed = errorInfo => {
         console.log('Failed:', errorInfo);
     }
-
-    onRegister = () => {
-      this.props.history.push('/register');
-    }
     render() {
         return (
                 <div id="loginContent">
@@ -66,11 +62,10 @@ class LoginPage extends React.Component<LoginFormProps, LoginParam> {
                         <Form.Item name="remember" valuePropName="checked" noStyle>
                           <Checkbox>记住密码</Checkbox>
                         </Form.Item>
-                        <a className="login-form-forgot" href="#!" onClick={this.onRegister}>
+                        <a className="login-form-forgot" href="/#/register">
                           没有账号？先注册吧！
                         </a>
                       </Form.Item>
-
                       <Form.Item>
                         <Button type="primary" htmlType="submit" block>
                           登录
