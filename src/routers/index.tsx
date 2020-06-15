@@ -1,17 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
+// import produce from "immer"
+// import { useDispatch, useMappedState, StoreContext } from 'redux-react-hook'
+import { connectAlita, useAlitaState } from 'redux-alita';
+import umbrella from 'umbrella-storage';
 import config, { IFMenuBase, IFMenu } from './config';
 import RouteWrapper from './RouteWrapper';
 import AllComponents from '../components';
 
 type RouterProps = {
-    smenus? : any;
+    smenus : any;
+    auth : any;
 }
-
-type RouterState =  {}
-
-class RoutersConfig extends React.Component<RouterProps, RouterState> {
+class RoutersConfig extends React.Component<RouterProps> {
     requireLogin = () => {
+        const { auth } = this.props; 
         return true;
     };
     redirectLogin = () => {
@@ -31,7 +34,8 @@ class RoutersConfig extends React.Component<RouterProps, RouterState> {
                         const wrapper = (
                             <RouteWrapper {... { ...props, Comp: Component,route:r}} />
                         );
-                        return this.requireLogin() ?  this.redirectLogin() : wrapper;
+                        // return this.requireLogin() ?  this.redirectLogin() : wrapper;
+                        return wrapper;
                     } }
                 />
             );
@@ -44,7 +48,6 @@ class RoutersConfig extends React.Component<RouterProps, RouterState> {
      };
 
      createRoute = (key : string) => {
-        console.log(this.props);
         return config[key].map(this.iterteMenu);
      };
      
@@ -53,12 +56,13 @@ class RoutersConfig extends React.Component<RouterProps, RouterState> {
         return (
             <Switch>
                 {Object.keys(config).map((key) => this.createRoute(key))}
-                {(smenus.data || sessionStorage.getItems('menu') || []).map(this.iterteMenu)}
-                <Route render={() => <Redirect to="/404" />} />}
+                { (smenus.data || umbrella.getLocalStorage('smenus') || []).map(this.iterteMenu)}
+                <Route render={() => <Redirect to="/404" />} />
             </Switch>
         );
      }
     
 }
 
-export default RoutersConfig;
+
+export default connectAlita([{ smenus: null }])(RoutersConfig);

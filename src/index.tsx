@@ -3,9 +3,12 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import Page from './Page';
 import * as serviceWorker from './serviceWorker';
+import { AlitaProvider } from 'redux-alita';
 
 ReactDOM.render(
-  <Page />,
+  <AlitaProvider>
+    <Page />
+  </AlitaProvider>,
   document.getElementById('root')
 );
 
