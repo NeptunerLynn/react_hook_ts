@@ -2,7 +2,6 @@ import React from 'react';
 import { Layout} from 'antd';
 import DocumentTitle from 'react-document-title';
 import RoutersConfig from './routers';
-import { connectAlita } from 'redux-alita';
 import umbrella from 'umbrella-storage';
 import { fetchMenu } from './axios';
 import './App.less'
@@ -13,18 +12,27 @@ require('./mock/index');
 const { Content, Footer } = Layout;
 
 type AppProps = {
-  setAlitaState: (param: any) => void;
+  setState: (param: any) => void;
+  smenus : any;
   auth: any;
 }
+
+// 创建菜单context
+export const {Provider, Consumer} = React.createContext({data : null});
 
 class App extends React.Component<AppProps> {
     state = {
       title : ''
     }
+    componentWillUnmount(){
+      // 卸载异步操作设置状态
+      this.setState = (state, callback) => {
+        return;
+      }
+    };
     componentDidMount(){
-      const { setAlitaState } = this.props;
       let user = sessionStorage.getItem("user");
-      user && setAlitaState({ stateName: 'auth', data: user });
+      this.setState({ stateName: 'auth', data: user });
       this.handleResize();
       this.fetchSmenu();
     };
@@ -48,10 +56,9 @@ class App extends React.Component<AppProps> {
 
     fetchSmenu = () => {
       const setMenu = (menus : any) => {
-        this.props.setAlitaState({ stateName: 'smenus', data: menus });
+        this.setState({ stateName: 'smenus', data: menus });
       };
       setMenu(umbrella.getLocalStorage('smenus') || []);
-      console.log(this.props);
       fetchMenu().then((smenus:any) =>{
         setMenu(smenus);
         umbrella.setLocalStorage('smenus', smenus);
@@ -60,7 +67,7 @@ class App extends React.Component<AppProps> {
 
      render() {
         const { title } = this.state;
-        const { auth = { data: {} } } = this.props;
+        const { auth = { data: {} },smenus } = this.props;
         return (
             <DocumentTitle title={title}>
                 <Layout>
@@ -69,7 +76,9 @@ class App extends React.Component<AppProps> {
                             user={this.props.userInfo}
                         /> */}
                         <Content className="app_layout_content">
-                            <RoutersConfig auth = {auth}/>
+                          <Provider value={smenus}>
+                            <RoutersConfig auth = {auth} smenus={smenus}/>  
+                          </Provider>  
                         </Content>
                         <Footer className="app_layout_foot">
                             <Copyright />
@@ -81,4 +90,4 @@ class App extends React.Component<AppProps> {
     }
 }
 
-export default connectAlita(['auth'])(App);
+export default App;

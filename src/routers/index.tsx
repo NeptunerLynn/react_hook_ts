@@ -1,12 +1,10 @@
 import React, { useEffect } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
-// import produce from "immer"
-// import { useDispatch, useMappedState, StoreContext } from 'redux-react-hook'
-import { connectAlita, useAlitaState } from 'redux-alita';
 import umbrella from 'umbrella-storage';
 import config, { IFMenuBase, IFMenu } from './config';
 import RouteWrapper from './RouteWrapper';
 import AllComponents from '../components';
+import { Consumer } from "../App";
 
 type RouterProps = {
     smenus : any;
@@ -34,8 +32,8 @@ class RoutersConfig extends React.Component<RouterProps> {
                         const wrapper = (
                             <RouteWrapper {... { ...props, Comp: Component,route:r}} />
                         );
-                        // return this.requireLogin() ?  this.redirectLogin() : wrapper;
-                        return wrapper;
+                        return this.requireLogin() ?  this.redirectLogin() : wrapper;
+                        // return wrapper;
                     } }
                 />
             );
@@ -52,17 +50,21 @@ class RoutersConfig extends React.Component<RouterProps> {
      };
      
      render(){
-        const { smenus } = this.props;
         return (
-            <Switch>
-                {Object.keys(config).map((key) => this.createRoute(key))}
-                { (smenus.data || umbrella.getLocalStorage('smenus') || []).map(this.iterteMenu)}
-                <Route render={() => <Redirect to="/404" />} />
-            </Switch>
+            <Consumer>
+                { (smenus) => 
+                    <Switch>
+                        {Object.keys(config).map((key) => this.createRoute(key))}
+                        { (umbrella.getLocalStorage('smenus') || smenus.data || []).map(this.iterteMenu)}
+                        <Route render={() => <Redirect to="/404" />} />
+                    </Switch>
+                 }
+            </Consumer>
         );
      }
     
 }
 
 
-export default connectAlita([{ smenus: null }])(RoutersConfig);
+// export default connectAlita([{ smenus: null }])(RoutersConfig);
+export default RoutersConfig;
